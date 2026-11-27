@@ -164,20 +164,25 @@ export const TryOnWindow: React.FC<TryOnWindowProps> = ({
   useEffect(() => {
     if (!activeGarment) return;
 
-    // Quick calibration flash on switch (1.2s matching the video)
-    if (!userDisabledSilhouette) {
-      setShowSilhouette(true);
-      const timer = setTimeout(() => {
-        setShowSilhouette(false);
-      }, 1200);
-      return () => clearTimeout(timer);
-    }
-
+    // 1. Immediately update simulator or Decart session
     if (engine === 'decart-live' && decartServiceRef.current) {
       decartServiceRef.current.updateGarmentPrompt(activeGarment.prompt);
     } else if (simulatorRef.current) {
       simulatorRef.current.setGarment(activeGarment);
     }
+
+    // 2. Quick calibration flash on switch (1s matching video)
+    let timer: any = null;
+    if (!userDisabledSilhouette) {
+      setShowSilhouette(true);
+      timer = setTimeout(() => {
+        setShowSilhouette(false);
+      }, 1000);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [activeGarment, engine, userDisabledSilhouette]);
 
   // Capture snapshot

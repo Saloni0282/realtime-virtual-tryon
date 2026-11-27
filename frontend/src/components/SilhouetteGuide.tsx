@@ -1,5 +1,4 @@
 import React from 'react';
-import { X } from 'lucide-react';
 
 interface SilhouetteGuideProps {
   guidanceText?: string;
@@ -17,41 +16,83 @@ export const SilhouetteGuide: React.FC<SilhouetteGuideProps> = ({
   return (
     <div
       onClick={onDismiss}
-      className="absolute inset-0 z-20 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-300"
-      title="Click anywhere to dismiss guide"
+      className="absolute inset-0 z-20 flex flex-col items-center justify-center cursor-pointer transition-all duration-500 overflow-hidden"
+      title="Click to dismiss guide"
     >
-      {/* Soft vignette */}
-      <div className="absolute inset-0 bg-black/25 backdrop-blur-[0.5px]" />
+      {/* SVG Inverse Cutout Mask matching Image 1 exactly */}
+      <svg
+        className="absolute inset-0 w-full h-full"
+        viewBox="0 0 400 300"
+        preserveAspectRatio="xMidYMid slice"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <mask id="cutout-silhouette-mask">
+            {/* White background reveals the dark overlay */}
+            <rect x="0" y="0" width="400" height="300" fill="white" />
 
-      {/* Person upper-body silhouette matching the video */}
-      <div className="relative z-10 flex flex-col items-center pointer-events-none">
-        <svg
-          className="w-44 h-60 text-white/45 drop-shadow-lg animate-pulse-subtle"
-          viewBox="0 0 200 280"
+            {/* Black shapes cut out the hole to reveal live webcam behind */}
+            {/* Head oval */}
+            <ellipse cx="200" cy="100" rx="36" ry="46" fill="black" />
+            {/* Neck & Shoulders & Torso */}
+            <path
+              d="M 168 140 
+                 Q 200 156 232 140 
+                 C 255 148 285 170 292 215 
+                 L 280 300 
+                 L 120 300 
+                 L 108 215 
+                 C 115 170 145 148 168 140 Z"
+              fill="black"
+            />
+          </mask>
+        </defs>
+
+        {/* The dark surrounding overlay using the cutout mask */}
+        <rect
+          x="0"
+          y="0"
+          width="400"
+          height="300"
+          fill="#121316"
+          opacity="0.94"
+          mask="url(#cutout-silhouette-mask)"
+        />
+
+        {/* Subtle white outline around the cutout boundary */}
+        <ellipse
+          cx="200"
+          cy="100"
+          rx="36"
+          ry="46"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Head & Neck */}
-          <ellipse cx="100" cy="55" rx="34" ry="42" stroke="currentColor" strokeWidth="2.5" strokeDasharray="6 4" fill="rgba(255, 255, 255, 0.06)" />
-          {/* Shoulders & Torso */}
-          <path
-            d="M 66 94 Q 100 110 134 94 C 160 102 188 126 194 175 L 182 270 L 18 270 L 6 175 C 12 126 40 102 66 94 Z"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeDasharray="6 4"
-            fill="rgba(255, 255, 255, 0.06)"
-          />
-        </svg>
+          stroke="rgba(255, 255, 255, 0.4)"
+          strokeWidth="1.5"
+          strokeDasharray="4 3"
+        />
+        <path
+          d="M 168 140 
+             Q 200 156 232 140 
+             C 255 148 285 170 292 215 
+             L 280 300 
+             L 120 300 
+             L 108 215 
+             C 115 170 145 148 168 140 Z"
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.4)"
+          strokeWidth="1.5"
+          strokeDasharray="4 3"
+        />
+      </svg>
 
-        {/* Guidance Prompt pill (like "Step back" in the video) */}
-        <div className="mt-3 px-3.5 py-1 rounded-full bg-white text-zinc-950 font-bold text-[11px] uppercase tracking-wider shadow-xl flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+      {/* "Step back" label matching Image 1 */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none select-none">
+        <span className="text-white text-xs font-bold tracking-wider uppercase drop-shadow-md">
           {guidanceText}
-        </div>
-
-        <p className="text-[10px] text-white/80 mt-2 font-medium drop-shadow">
-          Tap anywhere to dismiss
-        </p>
+        </span>
+        <span className="text-[10px] text-zinc-400">
+          (Tap anywhere to skip)
+        </span>
       </div>
     </div>
   );
